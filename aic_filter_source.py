@@ -14,6 +14,7 @@ Classes:
     AICFilter: For aic-sdk (uses 'aic_sdk' module)
 """
 
+import asyncio
 from pathlib import Path
 from typing import List, Optional
 
@@ -83,6 +84,7 @@ class AICFilter(BaseAudioFilter):
         self._aic_ready = False
         self._frames_per_block = 0
         self._audio_buffer = bytearray()
+        self._filter_lock = asyncio.Lock()  # Protects _audio_buffer and processing state
 
         # Audio format constants
         self._bytes_per_sample = 2  # int16 = 2 bytes
@@ -231,16 +233,17 @@ class AICFilter(BaseAudioFilter):
         Returns:
             None
         """
-        try:
-            if self._processor_ctx is not None:
-                self._processor_ctx.reset()
-        finally:
-            self._processor = None
-            self._processor_ctx = None
-            self._vad_ctx = None
-            self._model = None
-            self._aic_ready = False
-            self._audio_buffer.clear()
+        async with self._filter_lock:
+            try:
+                if self._processor_ctx is not None:
+                    self._processor_ctx.reset()
+            finally:
+                self._processor = None
+                self._processor_ctx = None
+                self._vad_ctx = None
+                self._model = None
+                self._aic_ready = False
+                self._audio_buffer.clear()
 
     async def process_frame(self, frame: FilterControlFrame):
         """Process control frames to enable/disable filtering.
@@ -273,51 +276,52 @@ class AICFilter(BaseAudioFilter):
         Returns:
             Enhanced audio data as bytes (int16 PCM).
         """
-        # FIX: Capture processor in a local variable to avoid TOCTOU race with
-        # stop(). stop() sets self._processor = None; if we read self._processor
-        # twice (once in the guard, once in process_async), stop() can run
-        # between those two reads and leave us calling None.process_async().
-        # A local reference keeps the object alive for the duration of this call.
-        processor = self._processor
-        if not self._aic_ready or processor is None:
-            return audio
+        async with self._filter_lock:
+            # FIX: Capture processor in a local variable to avoid TOCTOU race with
+            # stop(). stop() sets self._processor = None; if we read self._processor
+            # twice (once in the guard, once in process_async), stop() can run
+            # between those two reads and leave us calling None.process_async().
+            # A local reference keeps the object alive for the duration of this call.
+            processor = self._processor
+            if not self._aic_ready or processor is None:
+                return audio
 
-        self._audio_buffer.extend(audio)
-        available_frames = len(self._audio_buffer) // self._bytes_per_sample
-        num_blocks = available_frames // self._frames_per_block
+            self._audio_buffer.extend(audio)
+            available_frames = len(self._audio_buffer) // self._bytes_per_sample
+            num_blocks = available_frames // self._frames_per_block
 
-        if num_blocks == 0:
-            return b""
+            if num_blocks == 0:
+                return b""
 
-        block_size = self._frames_per_block * self._bytes_per_sample
+            block_size = self._frames_per_block * self._bytes_per_sample
 
-        # FIX: Convert blocks to immutable bytes and reset the bytearray BEFORE
-        # any 'await'. While awaiting process_async(), this coroutine is suspended
-        # and a concurrent filter() call (new audio frame) can run. If _audio_buffer
-        # still has an active memoryview export (mv / np.frombuffer on a bytearray),
-        # the concurrent .extend() raises:
-        #   BufferError: Existing exports of data: object cannot be re-sized
-        # Using immutable bytes eliminates the export lock entirely.
-        blocks_bytes = bytes(self._audio_buffer[:num_blocks * block_size])
-        self._audio_buffer = bytearray(self._audio_buffer[num_blocks * block_size:])
+            # FIX: Convert blocks to immutable bytes and reset the bytearray BEFORE
+            # any 'await'. While awaiting process_async(), this coroutine is suspended
+            # and a concurrent filter() call (new audio frame) can run. If _audio_buffer
+            # still has an active memoryview export (mv / np.frombuffer on a bytearray),
+            # the concurrent .extend() raises:
+            #   BufferError: Existing exports of data: object cannot be re-sized
+            # Using immutable bytes eliminates the export lock entirely.
+            blocks_bytes = bytes(self._audio_buffer[:num_blocks * block_size])
+            self._audio_buffer = bytearray(self._audio_buffer[num_blocks * block_size:])
 
-        filtered_chunks: List[bytes] = []
+            filtered_chunks: List[bytes] = []
 
-        for i in range(num_blocks):
-            start = i * block_size
-            block_i16 = np.frombuffer(blocks_bytes[start : start + block_size], dtype=self._dtype)
+            for i in range(num_blocks):
+                start = i * block_size
+                block_i16 = np.frombuffer(blocks_bytes[start : start + block_size], dtype=self._dtype)
 
-            # Reuse input buffer, in-place divide
-            np.copyto(self._in_f32[0], block_i16)
-            self._in_f32 /= self._scale
+                # Reuse input buffer, in-place divide
+                np.copyto(self._in_f32[0], block_i16)
+                self._in_f32 /= self._scale
 
-            out_f32 = await processor.process_async(self._in_f32)
+                out_f32 = await processor.process_async(self._in_f32)
 
-            # Convert float32 output back to int16
-            np.multiply(out_f32, self._scale, out=self._in_f32)  # reuse in_f32 as temp
-            np.clip(self._in_f32, -self._scale, self._scale - 1, out=self._in_f32)
-            np.copyto(self._out_i16, self._in_f32[0].astype(self._dtype))
+                # Convert float32 output back to int16
+                np.multiply(out_f32, self._scale, out=self._in_f32)  # reuse in_f32 as temp
+                np.clip(self._in_f32, -self._scale, self._scale - 1, out=self._in_f32)
+                np.copyto(self._out_i16, self._in_f32[0].astype(self._dtype))
 
-            filtered_chunks.append(self._out_i16.tobytes())
+                filtered_chunks.append(self._out_i16.tobytes())
 
-        return b"".join(filtered_chunks)
+            return b"".join(filtered_chunks)
