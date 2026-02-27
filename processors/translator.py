@@ -6,7 +6,7 @@ import uuid
 from collections import deque
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional, Callable, Awaitable, Dict, Any
+from typing import Optional, Callable, Awaitable, Dict, Any, Set
 
 import regex
 
@@ -33,26 +33,63 @@ logger = logging.getLogger(__name__)
 
 
 # ============================================================================
-# Turkish Abbreviations & Sentence Detection
+# Language-Aware Abbreviations & Sentence Detection
 # ============================================================================
 
-# Known Turkish abbreviations that end with '.' but are NOT sentence boundaries
-TURKISH_ABBREVS = {
-    # Titles
-    'hz', 'prof', 'dr', 'doç', 'yrd', 'av', 'mhd', 'müh', 'arş', 'gör',
-    'öğr', 'uzm',
-    # Military ranks
-    'yb', 'bnb', 'alb', 'gen', 'yzb', 'astsb', 'çvş', 'onb', 'er',
-    # Common abbreviations
-    'vb', 'vs', 'bkz', 'çev', 'ed', 'yy', 'no', 'tel', 'faks',
-    # Address abbreviations
-    'apt', 'mah', 'sok', 'cad', 'bul', 'sk', 'cd', 'bl', 'st', 'nr',
+# Known abbreviations that end with '.' but are NOT sentence boundaries
+ABBREVIATIONS: Dict[str, Set[str]] = {
+    "tr": {
+        # Titles
+        'hz', 'prof', 'dr', 'doç', 'yrd', 'av', 'mhd', 'müh', 'arş', 'gör',
+        'öğr', 'uzm',
+        # Military ranks
+        'yb', 'bnb', 'alb', 'gen', 'yzb', 'astsb', 'çvş', 'onb', 'er',
+        # Common abbreviations
+        'vb', 'vs', 'bkz', 'çev', 'ed', 'yy', 'no', 'tel', 'faks',
+        # Address abbreviations
+        'apt', 'mah', 'sok', 'cad', 'bul', 'sk', 'cd', 'bl', 'st', 'nr',
+    },
+    "en": {
+        # Titles
+        'mr', 'mrs', 'ms', 'dr', 'prof', 'sr', 'jr', 'st', 'rev', 'hon',
+        # Other common abbreviations
+        'etc', 'vs', 'ie', 'eg', 'al', 'approx', 'appt', 'apt', 'dept', 'est',
+        'min', 'max', 'misc', 'no', 'num', 'tel', 'temp', 'vet', 'vol',
+    },
+    "de": {
+        # German abbreviations
+        'abs', 'abb', 'anm', 'bzw', 'ca', 'd.h', 'dr', 'ev', 'ggf', 'hr', 'inkl',
+        'max', 'min', 'mio', 'mrd', 'nr', 'prof', 'sog', 'std', 'tel', 'usw', 'vgl',
+        'z.b', 'z.t',
+    },
+    "fr": {
+        # French abbreviations
+        'm', 'mme', 'mlle', 'dr', 'prof', 'st', 'ste', 'av', 'boul', 'fg', 'pl',
+        'tél', 'vol', 'etc',
+    },
+    "es": {
+        # Spanish abbreviations
+        'sr', 'sra', 'srta', 'dr', 'dra', 'prof', 'av', 'calle', 'pág', 'tel',
+        'ud', 'uds', 'vda',
+    },
+    "it": {
+        # Italian abbreviations
+        'sig', 'sig.ra', 'dott', 'dr', 'prof', 'avv', 'ing', 'arch', 'geom',
+        'p.es', 'ecc', 'pag', 'tel',
+    }
 }
 
 _PUNCT_RE = re.compile(r'[.!?]')
 
 
-def _is_sentence_boundary(text: str, pos: int) -> bool:
+def get_abbreviations(language_code: str) -> Set[str]:
+    """Get abbreviations for a specific language code (defaults to empty set if not found)."""
+    # Normalize language code (e.g., 'tr-TR' -> 'tr')
+    lang = language_code.lower().split('-')[0]
+    return ABBREVIATIONS.get(lang, set())
+
+
+def _is_sentence_boundary(text: str, pos: int, abbreviations: Set[str]) -> bool:
     """Check if position is a real sentence boundary (not abbreviation/number)."""
     ch = text[pos]
     if ch == '.':
@@ -61,16 +98,19 @@ def _is_sentence_boundary(text: str, pos: int) -> bool:
             return False
         # Skip known abbreviations
         before = text[:pos].rstrip()
-        last_word = before.split()[-1].lower().rstrip('.') if before.split() else ""
-        if last_word in TURKISH_ABBREVS:
-            return False
+        if before:
+            last_word_parts = before.split()
+            if last_word_parts:
+                last_word = last_word_parts[-1].lower().rstrip('.')
+                if last_word in abbreviations:
+                    return False
     # Check it's followed by space or end (with optional closing quotes)
     after = text[pos + 1:]
     after_stripped = after.lstrip('"\u201d\u00BB)')
     return not after_stripped or after_stripped[0].isspace()
 
 
-def find_last_sentence_end(text: str) -> int:
+def find_last_sentence_end(text: str, abbreviations: Set[str]) -> int:
     """Find the position after the last real sentence-ending punctuation.
 
     Returns -1 if no sentence boundary found.
@@ -79,23 +119,23 @@ def find_last_sentence_end(text: str) -> int:
     last_pos = -1
     for m in _PUNCT_RE.finditer(text):
         pos = m.start()
-        if _is_sentence_boundary(text, pos):
+        if _is_sentence_boundary(text, pos, abbreviations):
             after = text[pos + 1:]
             after_stripped = after.lstrip('"\u201d\u00BB)')
             last_pos = pos + 1 + (len(after) - len(after_stripped))
     return last_pos
 
 
-def count_sentences(text: str) -> int:
+def count_sentences(text: str, abbreviations: Set[str]) -> int:
     """Count the number of complete sentences in text."""
     count = 0
     for m in _PUNCT_RE.finditer(text):
-        if _is_sentence_boundary(text, m.start()):
+        if _is_sentence_boundary(text, m.start(), abbreviations):
             count += 1
     return count
 
 
-def ends_with_sentence(text: str) -> bool:
+def ends_with_sentence(text: str, abbreviations: Set[str]) -> bool:
     """Check if text ends with sentence-ending punctuation."""
     text = text.rstrip()
     if not text:
@@ -104,12 +144,12 @@ def ends_with_sentence(text: str) -> bool:
     last_char = text[-1]
     if last_char in '.!?':
         pos = len(text) - 1
-        return _is_sentence_boundary(text, pos)
+        return _is_sentence_boundary(text, pos, abbreviations)
     # Check if ends with quote after punctuation
     if last_char in '"\u201d\u00BB)':
         for i in range(len(text) - 2, -1, -1):
             if text[i] in '.!?':
-                return _is_sentence_boundary(text, i)
+                return _is_sentence_boundary(text, i, abbreviations)
             elif text[i] not in '"\u201d\u00BB)':
                 break
     return False
@@ -136,6 +176,9 @@ class InputBufferConfig:
     # Maximum buffer size before forcing flush (safety valve)
     max_buffer_words: int = 30
 
+    # Language code for abbreviation handling
+    language: str = "tr"
+
     @classmethod
     def default(cls) -> "InputBufferConfig":
         return cls()
@@ -151,7 +194,7 @@ class InputBuffer:
     - Timeout after 2 seconds of silence (speaker paused)
 
     Uses semantic sentence detection to avoid false positives from:
-    - Turkish abbreviations (Hz., Dr., Prof., etc.)
+    - Language-specific abbreviations (Hz., Dr., Prof., etc.)
     - Ordinal numbers (10., 255., etc.)
     """
 
@@ -165,6 +208,10 @@ class InputBuffer:
         self._buffer_text: str = ""
         self._buffer_time: float | None = None
         self._flush_timer_task: Optional[asyncio.Task] = None
+
+        # Pre-fetch abbreviations for the configured language
+        self._abbreviations = get_abbreviations(self._config.language)
+        logger.debug(f"[InputBuffer] Initialized for language '{self._config.language}' with {len(self._abbreviations)} abbreviations")
 
     def _get_word_count(self) -> int:
         return len(self._buffer_text.split()) if self._buffer_text else 0
@@ -182,11 +229,11 @@ class InputBuffer:
             return True
 
         # Multiple sentences (even if short)
-        if count_sentences(text) >= self._config.min_sentences:
+        if count_sentences(text, self._abbreviations) >= self._config.min_sentences:
             return True
 
         # Single decent sentence (uses semantic boundary detection)
-        if ends_with_sentence(text) and word_count >= self._config.min_words_with_punct:
+        if ends_with_sentence(text, self._abbreviations) and word_count >= self._config.min_words_with_punct:
             return True
 
         return False
@@ -212,7 +259,7 @@ class InputBuffer:
             self._buffer_text = text
 
         # Try to find a sentence boundary to split at
-        last_sentence_end = find_last_sentence_end(self._buffer_text)
+        last_sentence_end = find_last_sentence_end(self._buffer_text, self._abbreviations)
         
         if last_sentence_end != -1:
             # We have at least one complete sentence.
@@ -239,7 +286,7 @@ class InputBuffer:
 
         # If no split happened, check standard conditions on the whole buffer
         word_count = self._get_word_count()
-        sentence_count = count_sentences(self._buffer_text)
+        sentence_count = count_sentences(self._buffer_text, self._abbreviations)
 
         if self._should_send(self._buffer_text):
             logger.info(f"[STT send] ({word_count}w, {sentence_count}s) {self._buffer_text}")
@@ -362,9 +409,13 @@ class TranslateToTTSSpeakProcessor(FrameProcessor):
         self._on_translation = on_translation
         self._audio_filter = audio_filter
 
+        # Configure InputBuffer with the source language from global config
+        buffer_config = input_buffer_config or InputBufferConfig.default()
+        buffer_config.language = getattr(self._config, "source_language", "tr")
+
         # Input buffer (STT → translation) with semantic chunking
         self._input_buffer = InputBuffer(
-            input_buffer_config or InputBufferConfig.default(),
+            buffer_config,
             on_flush=self._submit_translation,
         )
 
