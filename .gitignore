@@ -1,0 +1,14 @@
+pipeline/.DS_Store
+*.pyc
+results/*
+logs/*
+.env
+.DS_Store
+*.wav
+*.idea
+daily-client/node_modules/
+daily-client/dist/
+ai-summary/
+Dockerfile
+docker-compose.yml
+Caddyfile

@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayarlar - Çeviri Sistemi</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/admin.css">
+</head>
+
+<body>
+    <!-- Top Bar -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <div class="topbar-logo">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 010 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 010-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+            </div>
+            <h1>Sistem Ayarları</h1>
+        </div>
+        <div class="topbar-right">
+            <div id="session-status-badge" class="status-badge status-badge--ready" aria-live="polite">
+                <span class="status-dot"></span>
+                <span class="status-text">Hazır</span>
+            </div>
+            <button type="button" class="btn-nav btn-nav--danger" id="resetDefaultsBtn">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                Fabrika Ayarları
+            </button>
+            <a href="/client-controls" class="btn-nav btn-nav--primary">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8" />
+                </svg>
+                Çevirmen
+            </a>
+            <button type="button" class="btn-logout" id="logoutBtn">
+                <svg class="nav-icon logout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline class="nav-icon-arrow" points="16 17 21 12 16 7"></polyline>
+                    <line class="nav-icon-arrow" x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Çıkış
+            </button>
+        </div>
+    </div>
+
+    <!-- Layout -->
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" aria-label="Ayarlar navigasyonu">
+            <nav class="sidebar-nav" role="tablist" aria-label="Ayarlar bölümleri">
+                <button type="button" id="tab-general" class="tab-btn active" role="tab" aria-selected="true"
+                    aria-controls="panel-general" data-tab="general">
+                    <svg class="tab-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.204-.107-.397.165-.71.505-.78.929l-.15.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Genel
+                </button>
+                <button type="button" id="tab-stt" class="tab-btn" role="tab" aria-selected="false"
+                    aria-controls="panel-stt" data-tab="stt">
+                    <svg class="tab-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+                    </svg>
+                    STT
+                </button>
+                <button type="button" id="tab-tts" class="tab-btn" role="tab" aria-selected="false"
+                    aria-controls="panel-tts" data-tab="tts">
+                    <svg class="tab-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
+                    </svg>
+                    TTS
+                </button>
+                <button type="button" id="tab-llm" class="tab-btn" role="tab" aria-selected="false"
+                    aria-controls="panel-llm" data-tab="llm">
+                    <svg class="tab-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-1.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 6.75v10.5a2.25 2.25 0 002.25 2.25z" />
+                    </svg>
+                    LLM
+                </button>
+                <button type="button" id="tab-audio" class="tab-btn" role="tab" aria-selected="false"
+                    aria-controls="panel-audio" data-tab="audio">
+                    <svg class="tab-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+                    </svg>
+                    Audio
+                </button>
+
+
+                <button type="button" id="tab-buffer" class="tab-btn" role="tab" aria-selected="false"
+                    aria-controls="panel-buffer" data-tab="buffer">
+                    <svg class="tab-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
+                    </svg>
+                    Buffer
+                </button>
+
+                <button type="button" id="tab-vocab" class="tab-btn" role="tab" aria-selected="false"
+                    aria-controls="panel-vocab" data-tab="vocab">
+                    <svg class="tab-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                    </svg>
+                    Sözlük
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- STT Panel -->
+            <section id="panel-stt" class="tab-panel" role="tabpanel" aria-labelledby="tab-stt" aria-hidden="true">
+                <div class="card">
+                    <h2 class="card-title">Speech-to-Text Ayarları</h2>
+                    <p class="card-desc">Konuşma tanıma servis sağlayıcı ve parametreleri</p>
+
+                    <div class="field-row">
+                        <div class="field">
+                            <label>Provider</label>
+                            <select id="stt_provider"
+                                onchange="onProviderChange('stt', ['elevenlabs', 'deepgram', 'gladia', 'speechmatics', 'gemini_live'])">
+                                <option value="elevenlabs">ElevenLabs</option>
+                                <option value="deepgram">Deepgram</option>
+                                <option value="gladia">Gladia</option>
+                                <option value="speechmatics">Speechmatics (En Yüksek Doğruluk)</option>
+                                <option value="gemini_live">Gemini Live</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Dil</label>
+                            <select id="stt_language">
+                                <option value="tr">Türkçe</option>
+                                <option value="en">English</option>
+                                <option value="ar">العربية</option>
+                                <option value="de">Deutsch</option>
+                                <option value="fr">Français</option>
+                                <option value="es">Español</option>
+                                <option value="ru">Русский</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="toggle-row u-mt-16" id="stt_vocab_toggle_row">
+                        <div class="toggle-label">
+                            Özel Sözlük (Custom Vocabulary)
+                            <small>Sözlük özelliğini genel olarak aktif eder. (Ayarları sol menüdeki 'Sözlük'
+                                sekmesinden yönetin)</small>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="stt_enable_custom_vocabulary"
+                                onchange="toggleCustomVocabInput()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- ElevenLabs STT -->
+                    <div class="provider-section visible" id="stt-elevenlabs">
+                        <span class="provider-badge elevenlabs">ElevenLabs</span>
+                        <div class="field-row">
+                            <div class="field">
+                                <label>API Key</label>
+                                <div class="key-field">
+                                    <input type="password" id="stt_api_key" placeholder="sk_...">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label>Model</label>
+                                <select id="stt_model" onchange="toggleCustomSTTModel('stt_model', 'stt_model_custom')">
+                                    <option value="scribe_v2_realtime">Scribe v2 Realtime</option>
+                                    <option value="custom">Özel Model (Custom)</option>
+                                </select>
+                                <input type="text" id="stt_model_custom" class="hidden u-mt-12"
+                                    placeholder="Özel model kimliği girin...">
+                            </div>
+                        </div>
+
+                        <!-- VAD Settings (ElevenLabs-specific) -->
+                        <h3 class="subsection-title">VAD Ayarları</h3>
+
+                        <div class="field">
+                            <label>Sessizlik Eşiği (saniye)</label>
+                            <div class="slider-group">
+                                <input type="range" id="vad_silence_threshold" min="0.2" max="2.0" step="0.1"
+                                    value="0.6">
+                                <span class="slider-value" id="vad_silence_threshold_val">0.6</span>
+                            </div>
+                            <span class="hint">Konuşma sonrası bekleme süresi. Düşük = hızlı yanıt, Yüksek = daha tam
+                                cümleler</span>
+                        </div>
+
+                        <div class="field u-mt-16">
+                            <label>VAD Hassasiyeti</label>
+                            <div class="slider-group">
+                                <input type="range" id="vad_threshold" min="0.1" max="0.9" step="0.05" value="0.5">
+                                <span class="slider-value" id="vad_threshold_val">0.5</span>
+                            </div>
+                            <span class="hint">Konuşma algılama hassasiyeti. Düşük = daha hassas</span>
+                        </div>
+
+                        <div class="field-row u-mt-16">
+                            <div class="field">
+                                <label>Min. Konuşma Süresi (ms)</label>
+                                <input type="number" id="min_speech_duration_ms" value="250" min="50" max="1000"
+                                    step="50">
+                            </div>
+                            <div class="field">
+                                <label>Min. Sessizlik Süresi (ms)</label>
+                                <input type="number" id="min_silence_duration_ms" value="200" min="50" max="1000"
+                                    step="50">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Deepgram STT -->
+                    <div class="provider-section" id="stt-deepgram">
+                        <span class="provider-badge deepgram">Deepgram — $200 ücretsiz kredi</span>
+                        <div class="field-row">
+                            <div class="field">
+                                <label>Deepgram API Key</label>
+                                <div class="key-field">
+                                    <input type="password" id="stt_deepgram_api_key" placeholder="dg_...">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label>Model</label>
+                                <select id="stt_deepgram_model"
+                                    onchange="toggleCustomSTTModel('stt_deepgram_model', 'stt_deepgram_model_custom')">
+                                    <option value="nova-3">Nova 3 (En İyi)</option>
+                                    <option value="nova-2">Nova 2</option>
+                                    <option value="base">Base</option>
+                                    <option value="custom">Özel Model (Custom)</option>
+                                </select>
+                                <input type="text" id="stt_deepgram_model_custom" class="hidden u-mt-12"
+                                    placeholder="Özel Deepgram UUID veya ismi...">
+                            </div>
+                        </div>
+
+                        <div class="toggle-row">
+                            <div class="toggle-label">
+                                Smart Format
+                                <small>Otomatik noktalama, büyük harf ve sayı biçimlendirme</small>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="stt_deepgram_smart_format" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-row">
+                            <div class="toggle-label">
+                                Punctuation
+                                <small>Noktalama işaretleri ekleme</small>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="stt_deepgram_punctuate" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-row">
+                            <div class="toggle-label">
+                                No Delay
+                                <small>Gecikme olmadan anında sonuç (daha az doğruluk)</small>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="stt_deepgram_no_delay">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="field-row u-mt-16">
+                            <div class="field">
+                                <label>Utterance End (ms)</label>
+                                <input type="number" id="stt_deepgram_utterance_end_ms" value="1000" min="100"
+                                    max="5000" step="100">
+                                <span class="hint">Konuşma sonu algılama süresi (ms)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gladia STT -->
+                    <div class="provider-section" id="stt-gladia">
+                        <span class="provider-badge gladia">Gladia</span>
+                        <div class="field-row">
+                            <div class="field">
+                                <label>Gladia API Key</label>
+                                <div class="key-field">
+                                    <input type="password" id="stt_gladia_api_key" placeholder="gladia_...">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label>Model</label>
+                                <select id="stt_gladia_model"
+                                    onchange="toggleCustomSTTModel('stt_gladia_model', 'stt_gladia_model_custom')">
+                                    <option value="solaria-1">Solaria 1</option>
+                                    <option value="custom">Özel Model (Custom)</option>
+                                </select>
+                                <input type="text" id="stt_gladia_model_custom" class="hidden u-mt-12"
+                                    placeholder="Özel Gladia model ismi...">
+                            </div>
+                        </div>
+
+                        <div class="field u-mt-16">
+                            <label>Endpointing (saniye)</label>
+                            <div class="slider-group">
+                                <input type="range" id="stt_gladia_endpointing" min="0.1" max="3.0" step="0.1"
+                                    value="0.5">
+                                <span class="slider-value" id="stt_gladia_endpointing_val">0.5</span>
+                            </div>
+                            <span class="hint">Konuşma sonu algılama hassasiyeti</span>
+                        </div>
+
+                        <div class="field u-mt-16">
+                            <div class="field">
+                                <label>Max Duration (saniye)</label>
+                                <input type="number" id="stt_gladia_max_duration" value="5" min="1" max="30" step="1">
+                                <span class="hint">Endpointing olmadan maksimum süre</span>
+                            </div>
+                        </div>
+
+                        <div class="toggle-row">
+                            <div class="toggle-label">
+                                Audio Enhancer
+                                <small>Ses kalitesi iyileştirme (gürültü azaltma)</small>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="stt_gladia_audio_enhancer">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-row">
+                            <div class="toggle-label">
+                                Code Switching
+                                <small>Konuşma içinde diller arası geçiş algılama</small>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="stt_gladia_code_switching">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Speechmatics STT -->
+                    <div class="provider-section" id="stt-speechmatics">
+                        <span class="provider-badge provider-badge--speechmatics">🎯 Speechmatics — En Yüksek
+                            Doğruluk</span>
+                        <div class="field-row">
+                            <div class="field">
+                                <label>Speechmatics API Key</label>
+                                <div class="key-field">
+                                    <input type="password" id="stt_speechmatics_api_key" placeholder="API key...">
+                                    <span class="hint hint--with-margin">speechmatics.com/my-account/api-keys adresinden
+                                        alın</span>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label>Dil</label>
+                                <select id="stt_speechmatics_language">
+                                    <option value="tr">Türkçe (tr)</option>
+                                    <option value="en">English (en)</option>
+                                    <option value="ar">Arabic (ar)</option>
+                                    <option value="de">Deutsch (de)</option>
+                                    <option value="fr">Français (fr)</option>
+                                    <option value="es">Español (es)</option>
+                                    <option value="ru">Русский (ru)</option>
+                                    <option value="it">Italiano (it)</option>
+                                    <option value="pt">Português (pt)</option>
+                                    <option value="nl">Nederlands (nl)</option>
+                                    <option value="ja">日本語 (ja)</option>
+                                    <option value="zh">中文 (zh)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="field-row u-mt-16">
+                            <div class="field">
+                                <label>Turn Detection Modu</label>
+                                <select id="stt_speechmatics_turn_detection">
+                                    <option value="smart_turn">SMART_TURN — ML tabanlı, dil uyumlu (Önerilen)</option>
+                                    <option value="external">EXTERNAL — Pipecat VAD (Sessizlik tabanlı)</option>
+                                    <option value="adaptive">ADAPTIVE — Speechmatics Basic VAD</option>
+                                </select>
+                                <span class="hint">Türkçe için SMART_TURN önerilir.</span>
+                            </div>
+                            <div class="field">
+                                <label>Max Delay (saniye)</label>
+                                <input type="number" id="stt_speechmatics_max_delay" value="1.0" min="0.2" max="5.0"
+                                    step="0.1">
+                                <span class="hint">Düşük = hızlı sonuç, Yüksek = daha doğru (önerilen: 1.0)</span>
+                            </div>
+                            <div class="field">
+                                <label><span class="visually-hidden">Boş</span></label>
+                                <div class="toggle-row u-mt-12">
+                                    <div class="toggle-label">
+                                        Partial Transcripts
+                                        <small>Anlık kısmi sonuçları dahil et</small>
+                                    </div>
+                                    <label class="toggle">
+                                        <input type="checkbox" id="stt_speechmatics_enable_partials" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gemini Live STT -->
+                    <div class="provider-section" id="stt-gemini_live">
+                        <span class="provider-badge provider-badge--gemini-live">⚡ Gemini Live — Native Audio STT</span>
+                        <p class="card-note">
+                            Google Gemini Live WebSocket API ile gerçek zamanlı mikrofon transkripsiyonu.
+                            Yerleşik VAD ile doğrudan Gemini modeli konuşma tespiti yapar.
+                        </p>
+
+
+                        <!-- API Key + Model -->
+                        <div class="field-row">
+                            <div class="field">
+                                <label>Google API Key</label>
+                                <div class="key-field">
+                                    <input type="password" id="stt_gemini_api_key" placeholder="AIza...">
+                                    <span class="hint hint--with-margin">aistudio.google.com adresinden alın</span>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label>Model</label>
+                                <select id="stt_gemini_stt_model_select" onchange="onGeminiSTTModelChange()">
+                                    <option value="gemini-2.5-flash-native-audio-preview-12-2025">
+                                        gemini-2.5-flash-native-audio-preview-12-2025 (Önerilen)</option>
+                                    <option value="gemini-2.0-flash-live-001">gemini-2.0-flash-live-001</option>
+                                    <option value="custom">Özel model...</option>
+                                </select>
+                                <input type="text" id="stt_gemini_stt_model" class="hidden u-mt-12"
+                                    placeholder="models/gemini-...">
+                            </div>
+                        </div>
+
+                        <!-- VAD Ayarları -->
+                        <div class="section-subheader u-mt-16">🎙️ Sesli Aktivite Algılama (VAD)</div>
+                        <div class="field-row u-mt-8">
+                            <div class="field">
+                                <label>Konuşma Bitiş Gecikmesi (ms)</label>
+                                <input type="number" id="stt_gemini_stt_silence_duration_ms" min="100" max="3000"
+                                    step="50" placeholder="400">
+                                <span class="hint">Duraksamadan kaç ms sonra cümle bitti sayılır · 250–600
+                                    önerilir</span>
+                            </div>
+                            <div class="field">
+                                <label>Konuşma Başlangıç Hassasiyeti</label>
+                                <select id="stt_gemini_stt_start_sensitivity">
+                                    <option value="HIGH">HIGH — Konuşmayı hızlı yakala (önerilen)</option>
+                                    <option value="LOW">LOW — Gürültülü ortamlarda yanlış tetiklenmeyi azalt</option>
+                                </select>
+                                <span class="hint">LOW = arka plan gürültüsüne karşı daha toleranslı</span>
+                            </div>
+                        </div>
+                        <div class="field-row u-mt-8">
+                            <div class="field">
+                                <label>Konuşma Bitiş Hassasiyeti</label>
+                                <select id="stt_gemini_stt_end_sensitivity">
+                                    <option value="HIGH">HIGH — Hızlı bitiş tespiti (daha az gecikme)</option>
+                                    <option value="LOW">LOW — Konuşma aralarına toleranslı</option>
+                                </select>
+                                <span class="hint">HIGH = düşük gecikme · LOW = cümle ortasında yanlış kesmeyi
+                                    önler</span>
+                            </div>
+                            <div class="field">
+                                <label>Ön Ses Tamponu (ms) <small
+                                        style="font-weight:400;color:#64748b;">prefix_padding_ms</small></label>
+                                <input type="number" id="stt_gemini_stt_prefix_padding_ms" min="0" max="2000" step="20"
+                                    placeholder="0">
+                                <span class="hint">Konuşma başlamadan önce kaç ms ses dahil edilsin · 0 = devre
+                                    dışı</span>
+                            </div>
+                        </div>
+
+                        <!-- Session Özellikleri -->
+                        <div class="section-subheader u-mt-16">⚙️ Session Özellikleri</div>
+                        <div class="toggle-row u-mt-8">
+                            <div class="toggle-label">
+                                Context Window Compression
+                                <small>1+ saat süren konferanslarda token sınırına takılmayı önler
+                                    (SlidingWindow)</small>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="stt_gemini_stt_context_compression" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-row">
+                            <div class="toggle-label">
+                                Noktalama + Büyük Harf Modu
+                                <small>Gemini noktalama işaretleri ekler ve cümle başlarını büyük yazar</small>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="stt_gemini_stt_punctuation_mode" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <!-- Domain Kelime Listesi -->
+                        <div class="section-subheader u-mt-16">📖 Domain Kelime Listesi</div>
+                        <div class="field u-mt-8">
+                            <label>Özel Terminoloji
+                                <span class="hint" style="display:inline;margin-left:6px;">Virgülle ayırın · Boş = devre
+                                    dışı</span>
+                            </label>
+                            <textarea id="stt_gemini_stt_domain_vocabulary" rows="4"
+                                placeholder="Allah, Kur'an, Hadis, Sünnet, Peygamber, Muhammed, İslam, namaz, dua, secde, rükü, sahabe, Hz., Ramazan, Kurban, tefsir, fıkıh, akaid, kelam, tasavvuf, Medine, Mekke, Kabe, Uhud, Bedir, hicret, fetih, sünni, şia, mezhep, imam, müfessir, muhaddis, fakih"
+                                class="textarea-field" style="min-height:90px;"></textarea>
+                            <span class="hint">Gemini bu terimleri duyduğunda tam olarak bu yazımı kullanır. .txt veya
+                                .json dosyasından yükleyebilirsiniz.</span>
+                        </div>
+                        <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+                            <input type="file" id="gemini_vocab_file" accept=".txt,.json" style="display:none"
+                                onchange="handleGeminiVocabUpload(this)">
+                            <button type="button" onclick="document.getElementById('gemini_vocab_file').click()"
+                                style="padding:5px 12px;font-size:12px;border-radius:6px;border:1px solid rgba(96,165,250,0.3);background:rgba(96,165,250,0.08);color:#60a5fa;cursor:pointer;font-family:inherit;">
+                                📂 Dosyadan Yükle (.txt / .json)
+                            </button>
+                            <button type="button"
+                                onclick="document.getElementById('stt_gemini_stt_domain_vocabulary').value=''"
+                                style="padding:5px 12px;font-size:12px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:#64748b;cursor:pointer;font-family:inherit;">
+                                🗑 Temizle
+                            </button>
+                        </div>
+
+                        <!-- STT Sistem Promptu -->
+                        <div class="section-subheader u-mt-16">🤖 STT Sistem Promptu</div>
+                        <div class="field u-mt-8">
+                            <label>Özel Transkripsiyon Talimatı
+                                <span class="hint" style="display:inline;margin-left:6px;">Boş bırakılırsa modele hiçbir
+                                    talimat gönderilmez</span>
+                            </label>
+                            <textarea id="stt_gemini_stt_system_instruction" rows="3" class="textarea-field"></textarea>
+                            <span class="hint">STT'yi yönlendirecek özel kuralınız varsa yazın, aksi halde boş
+                                bırakın.</span>
+                        </div>
+                    </div><!-- /stt-gemini_live -->
+
+                    <div class="actions">
+                        <button class="btn-reset" onclick="loadConfig()"><svg class="btn-icon-svg" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg> Sıfırla</button>
+                        <button class="btn-save" onclick="saveSection('stt')"><svg class="btn-icon-svg"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                            </svg> Kaydet</button>
+                    </div>
+                </div><!-- /card -->
+            </section>
+
+
+            <!-- TTS Panel -->
+            <section id="panel-tts" class="tab-panel" role="tabpanel" aria-labelledby="tab-tts" aria-hidden="true">
+                <div class="card">
+                    <h2 class="card-title">Text-to-Speech Ayarları</h2>
+                    <p class="card-desc">Ses sentezi servis sağlayıcı ve parametreleri</p>
+
+                    <div class="field-row">
+                        <div class="field">
+                            <label>Provider</label>
+                            <select id="tts_provider" onchange="onProviderChange('tts', ['elevenlabs', 'deepgram'])">
+                                <option value="elevenlabs">ElevenLabs</option>
+                                <option value="deepgram">Deepgram</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- ElevenLabs TTS -->
+                    <div class="provider-section visible" id="tts-elevenlabs">
+                        <span class="provider-badge elevenlabs">ElevenLabs</span>
+                        <div class="field-row">
+                            <div class="field">
+                                <label>API Key</label>
+                                <div class="key-field">
+                                    <input type="password" id="tts_api_key" placeholder="sk_...">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label>Voice ID (Ana Konuşmacı)</label>
+                                <input type="text" id="tts_voice_id" placeholder="ElevenLabs'ten kopyalayın">
+                                <span class="hint">Ana konuşmacı için klonlanmış veya seçilmiş ses</span>
+                            </div>
+                        </div>
+
+                        <div class="field-row">
+                            <div class="field">
+                                <label>Ses Cinsiyeti / ID</label>
+                                <select id="tts_voice_gender" onchange="toggleVoiceIdInput()">
+                                    <option value="male">Erkek (Preset)</option>
+                                    <option value="female">Kadın (Preset)</option>
+                                    <option value="custom">Özel Voice ID</option>
+                                </select>
+                            </div>
+                            <!-- Custom Voice ID input, shown only if gender is 'custom' -->
+                            <div class="field hidden" id="tts_voice_id_container">
+                                <label>Özel Voice ID</label>
+                                <input type="text" id="tts_voice_id_custom" placeholder="ElevenLabs Voice ID">
+                            </div>
+                        </div>
+
+                        <!-- Hidden storage for male/female presets -->
+                        <div class="hidden">
+                            <input type="text" id="tts_voice_id_male" placeholder="pNInz6obpgDQGcFmaJgB">
+                            <input type="text" id="tts_voice_id_female" placeholder="Xb7hH8MSUJpSbSDYk0k2">
+                        </div>
+
+                        <div class="field-row">
+                            <div class="field">
+                                <label>Model</label>
+                                <select id="tts_model">
+                                    <option value="eleven_flash_v2_5">Flash v2.5 (Hızlı)</option>
+                                    <option value="eleven_multilingual_v2">Multilingual v2</option>
+                                    <option value="eleven_turbo_v2_5">Turbo v2.5</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="field u-mt-16">
+                            <label>Konuşma Hızı</label>
+                            <div class="slider-group">
+                                <input type="range" id="tts_speed" min="0.7" max="1.2" step="0.05" value="0.95">
+                                <span class="slider-value" id="tts_speed_val">0.95</span>
+                            </div>
+                        </div>
+
+                        <div class="field u-mt-12">
+                            <label>Stabilite</label>
+                            <div class="slider-group">
+                                <input type="range" id="tts_stability" min="0" max="1" step="0.05" value="0.75">
+                                <span class="slider-value" id="tts_stability_val">0.75</span>
+                            </div>
+                        </div>
+
+                        <div class="field u-mt-12">
+                            <label>Benzerlik</label>
+                            <div class="slider-group">
+                                <input type="range" id="tts_similarity_boost" min="0" max="1" step="0.05" value="0.3">
+                                <span class="slider-value" id="tts_similarity_boost_val">0.3</span>
+                            </div>
+                        </div>
+
+                        <div class="field u-mt-12">
+                            <label>Style</label>
+                            <div class="slider-group">
+                                <input type="range" id="tts_style" min="0" max="1" step="0.05" value="0">
+                                <span class="slider-value" id="tts_style_val">0</span>
+                            </div>
+                            <span class="hint">Ses stili yoğunluğu (0 = nötr)</span>
+                        </div>
+
+                        <div class="toggle-row">
+                            <div class="toggle-label">
+                                Speaker Boost
+                                <small>Konuşmacı sesini güçlendir</small>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="tts_use_speaker_boost" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="field u-mt-12">
+                            <label>Text Normalization</label>
+                            <select id="tts_apply_text_normalization">
+                                <option value="auto">Auto</option>
+                                <option value="on">On</option>
+                                <option value="off">Off</option>
+                            </select>
+                            <span class="hint">Metin normalizasyonu (sayı/tarih okuma)</span>
+                        </div>
+                    </div>
+
+                    <!-- Deepgram TTS (inside card, same as STT structure) -->
+                    <div class="provider-section" id="tts-deepgram">
+                        <span class="provider-badge deepgram">Deepgram</span>
+                        <div class="field-row">
+                            <div class="field">
+                                <label>Deepgram API Key</label>
+                                <div class="key-field">
+                                    <input type="password" id="tts_deepgram_api_key" placeholder="dg_...">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label>Ses Modeli</label>
+                                <select id="tts_deepgram_model">
+                                    <option value="aura-asteria-en">Aura Asteria (EN)</option>
+                                    <option value="aura-luna-en">Aura Luna (EN)</option>
+                                    <option value="aura-stella-en">Aura Stella (EN)</option>
+                                    <option value="aura-orion-en">Aura Orion (EN)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="field-row u-mt-16">
+                            <div class="field">
+                                <label>Encoding</label>
+                                <select id="tts_deepgram_encoding">
+                                    <option value="linear16">Linear16 (PCM)</option>
+                                    <option value="mulaw">Mu-Law</option>
+                                    <option value="alaw">A-Law</option>
+                                </select>
+                                <span class="hint">Ses çıkış kodlaması</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-reset" onclick="loadConfig()"><svg class="btn-icon-svg" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg> Sıfırla</button>
+                    <button class="btn-save" onclick="saveSection('tts')"><svg class="btn-icon-svg" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                        </svg> Kaydet</button>
+                </div>
+            </section>
+
+            <!-- LLM Panel -->
+            <section id="panel-llm" class="tab-panel" role="tabpanel" aria-labelledby="tab-llm" aria-hidden="true">
+                <div class="card">
+                    <div
+                        style="display: flex; gap: 12px; margin-bottom: 24px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">
+                        <button type="button" id="btn-llm-translator" onclick="switchLlmSubTab('translator')"
+                            style="background:none; border:none; padding:8px 16px; cursor:pointer; font-weight:600; font-size:16px; color: #3b82f6; border-bottom: 2px solid #3b82f6; margin-bottom: -10px;">Çeviri
+                            Motoru</button>
+                        <button type="button" id="btn-llm-verifier" onclick="switchLlmSubTab('verifier')"
+                            style="background:none; border:none; padding:8px 16px; cursor:pointer; font-weight:600; font-size:16px; color: #64748b; margin-bottom: -10px;">Doğrulayıcı
+                            (Fast Verifier)</button>
+                    </div>
+
+                    <div id="section-llm-translator">
+                        <p class="card-desc">Çeviri modeli, sağlayıcı ve sistem promptu</p>
+
+                        <!-- Provider Selector -->
+                        <div class="field-row">
+                            <div class="field">
+                                <label>Provider</label>
+                                <select id="llm_provider"
+                                    onchange="onProviderChange('llm', ['openai', 'gemini', 'groq'])">
+                                    <option value="openai">OpenAI </option>
+                                    <option value="gemini">Gemini</option>
+                                    <option value="groq">Groq</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- OpenAI Section -->
+                        <div class="provider-section visible" id="llm-openai">
+                            <span class="provider-badge provider-badge--openai">OpenAI</span>
+                            <div class="field-row">
+                                <div class="field">
+                                    <label>OpenAI API Key</label>
+                                    <div class="key-field">
+                                        <input type="password" id="llm_api_key" placeholder="sk-proj-...">
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label>Model</label>
+                                    <input type="text" id="llm_model_openai" placeholder="gpt-4o-mini"
+                                        oninput="syncLLMModel()">
+                                    <span class="hint">Örnek: gpt-4o, gpt-4o-mini, ft:gpt-4.1-mini-2025:org:id</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Google Gemini Section -->
+                        <div class="provider-section" id="llm-gemini">
+                            <span class="provider-badge provider-badge--gemini">Google Gemini</span>
+                            <div class="field-row">
+                                <div class="field">
+                                    <label>Google API Key</label>
+                                    <div class="key-field">
+                                        <input type="password" id="llm_gemini_api_key" placeholder="AIza...">
+                                        <span class="hint hint--with-margin">aistudio.google.com adresinden alın</span>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label>Model</label>
+                                    <input type="text" id="llm_model_gemini" placeholder="gemini-2.5-flash"
+                                        oninput="syncLLMModel()">
+                                    <span class="hint">Örnek: gemini-2.5-flash, gemini-2.5-pro, tunedModels/…</span>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- Groq Section -->
+                        <div class="provider-section" id="llm-groq">
+                            <span class="provider-badge provider-badge--groq">⚡ Groq</span>
+                            <div class="field-row">
+                                <div class="field">
+                                    <label>Groq API Key</label>
+                                    <div class="key-field">
+                                        <input type="password" id="llm_groq_api_key" placeholder="gsk_...">
+                                        <span class="hint hint--with-margin">console.groq.com adresinden ücretsiz
+                                            alın</span>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label>Model</label>
+                                    <input type="text" id="llm_model_groq" placeholder="llama-3.3-70b-versatile"
+                                        oninput="syncLLMModel()">
+                                    <span class="hint">Örnek: llama-3.3-70b-versatile, llama-3.1-8b-instant,
+                                        mixtral-8x7b-32768</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hidden model field (actual value sent to API) -->
+                        <input type="hidden" id="llm_model">
+
+                        <div class="field-row full u-mt-20">
+                            <div class="field">
+                                <label>Sistem Promptu</label>
+                                <textarea id="llm_system_prompt" rows="10"
+                                    placeholder="Çeviri sistemi promptu..."></textarea>
+                                <span class="hint">llm_prompt.txt dosyası olarak kaydedilir. {src_name} ve {tgt_name}
+                                    değişkenleri kullanılabilir.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAST VERIFIER CARD SECTION -->
+                    <div id="section-llm-verifier" style="display: none;">
+                        <p class="card-desc">STT çıktılarını çeviri öncesinde kontrol edip filtreler.</p>
+                        <div class="toggle-row">
+                            <div class="toggle-label">
+                                Doğrulayıcıyı Etkinleştir
+                                <small>Geçersiz fısıltıları 'DROP' komutu ile filtreler</small>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="verifier_enabled" onchange="toggleVerifierSettings()">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div id="verifier_settings_container" style="display: none;" class="u-mt-16">
+                            <div class="field-row">
+                                <div class="field">
+                                    <label>Model Provider</label>
+                                    <select id="verifier_provider">
+                                        <option value="groq">Groq (Hızlı/Önerilen)</option>
+                                        <option value="openai">OpenAI</option>
+                                        <option value="gemini">Gemini</option>
+                                    </select>
+                                </div>
+                                <div class="field">
+                                    <label>Filtre Modeli</label>
+                                    <input type="text" id="verifier_model" placeholder="llama3-8b-8192">
+                                    <span class="hint">Örn: llama3-8b-8192, gpt-4o-mini</span>
+                                </div>
+                            </div>
+                            <div class="field-row full u-mt-12">
+                                <div class="field">
+                                    <label>Zaman Aşımı (Timeout - Sn)</label>
+                                    <div class="slider-group">
+                                        <input type="range" id="verifier_timeout" min="1.0" max="10.0" step="0.5"
+                                            oninput="document.getElementById('verifier_timeout_val').textContent = this.value">
+                                        <span class="slider-value" id="verifier_timeout_val">3.0</span>
+                                    </div>
+                                    <span class="hint">Bu süre içinde (sn) LLM'den yanıt gelmezse doğrudan çeviriye
+                                        geçer.</span>
+                                </div>
+                            </div>
+                            <div class="field-row full u-mt-12">
+                                <div class="field">
+                                    <label>Sistem Promptu</label>
+                                    <textarea id="verifier_prompt" rows="8"
+                                        placeholder="İstediğiniz sistem promptunu buraya yazın..."></textarea>
+                                    <span class="hint">
+                                        İstediğiniz promptu özgürce yazabilirsiniz. LLM çıktısı şu kurallara göre
+                                        işlenir:
+                                        <b>DROP</b> dönerse parça atılır &bull;
+                                        <b>KEEP|metin</b> dönerse düzeltilmiş metin kullanılır &bull;
+                                        Başka bir şey dönerse o metin doğrudan kullanılır (serbest format).
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-reset" onclick="loadConfig()"><svg class="btn-icon-svg" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg> Sıfırla</button>
+                    <button class="btn-save" onclick="saveSection('llm'); saveSection('verifier');"><svg
+                            class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                        </svg> Kaydet</button>
+                </div>
+            </section>
+
+            <!-- Audio Panel -->
+            <section id="panel-audio" class="tab-panel" role="tabpanel" aria-labelledby="tab-audio" aria-hidden="true">
+                <div class="card">
+                    <h2 class="card-title">Ses İşleme Ayarları</h2>
+                    <p class="card-desc">AIC Filter (ai-coustics) ve ses parametreleri</p>
+
+                    <div class="toggle-row">
+                        <div class="toggle-label">
+                            AIC Filter
+                            <small>ai-coustics SDK gürültü giderme</small>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="audio_aic_enabled" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-row">
+                        <div class="toggle-label">
+                            Gain Compensation
+                            <small>AIC azalttığı ses seviyesini otomatik geri yükle</small>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="audio_aic_gain_compensation" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-row">
+                        <div class="toggle-label">
+                            Debug Mode
+                            <small>Orijinal ve filtrelenmiş ses kayıtlarını debug_audio/ klasörüne kaydet (restart
+                                gerektirir)</small>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="audio_debug_audio">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="field-row u-mt-20">
+                        <div class="field">
+                            <label>AIC Lisans Anahtarı</label>
+                            <div class="key-field">
+                                <input type="password" id="audio_aic_license_key" placeholder="eyJ...">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>AIC Model ID</label>
+                            <input type="text" id="audio_aic_model_id" value="quail-vf-l-16khz">
+                        </div>
+                    </div>
+
+                    <div class="field-row u-mt-20">
+                        <div class="field">
+                            <label>STT Sample Rate (Hz)</label>
+                            <input type="number" id="audio_sample_rate" value="16000" min="8000" max="48000"
+                                step="1000">
+                            <span class="hint">STT giriş örnekleme hızı</span>
+                        </div>
+                        <div class="field">
+                            <label>TTS Sample Rate (Hz)</label>
+                            <input type="number" id="audio_output_sample_rate" value="24000" min="8000" max="48000"
+                                step="1000">
+                            <span class="hint">TTS çıkış örnekleme hızı</span>
+                        </div>
+                    </div>
+
+                    <div class="field-row">
+                        <div class="field">
+                            <label>Kanallar</label>
+                            <select id="audio_channels">
+                                <option value="1">1 (Mono)</option>
+                                <option value="2">2 (Stereo)</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Chunk Size (ms)</label>
+                            <input type="number" id="audio_chunk_size_ms" value="100" min="20" max="500" step="10">
+                            <span class="hint">Ses parça boyutu (milisaniye)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-reset" onclick="loadConfig()"><svg class="btn-icon-svg" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg> Sıfırla</button>
+                    <button class="btn-save" onclick="saveSection('audio')"><svg class="btn-icon-svg"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                        </svg> Kaydet</button>
+                </div>
+            </section>
+
+            <!-- General Panel -->
+            <section id="panel-general" class="tab-panel active" role="tabpanel" aria-labelledby="tab-general"
+                aria-hidden="false">
+                <div class="card">
+                    <h2 class="card-title">Genel Ayarlar</h2>
+                    <p class="card-desc">Dil ve loglama ayarları</p>
+
+                    <div class="field-row">
+                        <div class="field">
+                            <label>Kaynak Dil</label>
+                            <select id="general_source_language">
+                                <option value="tr">Türkçe</option>
+                                <option value="en">English</option>
+                                <option value="ar">العربية</option>
+                                <option value="de">Deutsch</option>
+                                <option value="fr">Français</option>
+                                <option value="ru">Русский</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Hedef Dil</label>
+                            <select id="general_target_language">
+                                <option value="tr">Türkçe</option>
+                                <option value="en" selected>English</option>
+                                <option value="ar">العربية</option>
+                                <option value="de">Deutsch</option>
+                                <option value="fr">Français</option>
+                                <option value="ru">Русский</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="field-row">
+                        <div class="field">
+                            <label>Log Seviyesi</label>
+                            <select id="general_log_level">
+                                <option value="DEBUG">DEBUG</option>
+                                <option value="INFO">INFO</option>
+                                <option value="WARNING">WARNING</option>
+                                <option value="ERROR">ERROR</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Hedef Gecikme (ms)</label>
+                            <input type="number" id="general_target_latency_ms" value="5000" min="1000" max="15000"
+                                step="500">
+                            <span class="hint">Çeviri pipeline gecikme hedefi</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TEST MP3 URL -->
+                <div class="card">
+                    <h2 class="card-title">TEST MP3 URL</h2>
+                    <p class="card-desc">MP3 URL'den ses akışı ile çeviri testi. Mikrofon yerine MP3 kaynağından ses
+                        alır.</p>
+
+                    <div class="toggle-row">
+                        <div class="toggle-label">
+                            MP3 Akışı
+                            <small>Aktifken MP3 URL'den ses akışı yapılır</small>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="mp3_stream_enabled" onchange="toggleMp3Stream()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="field-row full u-mt-16">
+                        <div class="field">
+                            <label>MP3 URL</label>
+                            <input type="text" id="mp3_stream_url" placeholder="https://example.com/audio.mp3">
+                            <span class="hint">Canlı yayın veya MP3 dosya URL'si</span>
+                        </div>
+                    </div>
+
+                    <div id="mp3_stream_status" class="status-text" aria-live="polite"></div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-reset" onclick="loadConfig()"><svg class="btn-icon-svg" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg> Sıfırla</button>
+                    <button class="btn-save" onclick="saveSection('general')"><svg class="btn-icon-svg"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                        </svg> Kaydet</button>
+                </div>
+            </section>
+
+            <!-- Buffer Panel -->
+            <section id="panel-buffer" class="tab-panel" role="tabpanel" aria-labelledby="tab-buffer"
+                aria-hidden="true">
+                <div class="card">
+                    <h2 class="card-title">Çeviri Buffer Ayarları</h2>
+                    <p class="card-desc">STT çıktısını LLM'e göndermeden önce bufferlayan InputBufferConfig
+                        parametreleri</p>
+
+                    <div class="field">
+                        <label>Flush Timeout (saniye)</label>
+                        <div class="slider-group">
+                            <input type="range" id="buffer_flush_timeout_secs" min="1.0" max="10.0" step="0.5"
+                                value="3.0">
+                            <span class="slider-value" id="buffer_flush_timeout_secs_val">3.0</span>
+                        </div>
+                        <span class="hint">Son STT parçasından sonra otomatik gönderme süresi</span>
+                    </div>
+
+                    <div class="field-row u-mt-16">
+                        <div class="field">
+                            <label>Min. Kelime (Uzun)</label>
+                            <input type="number" id="buffer_min_words_long" value="7" min="3" max="20">
+                            <span class="hint">Noktalamaya bakmadan gönder (≥ N kelime)</span>
+                        </div>
+                        <div class="field">
+                            <label>Min. Kelime (Noktalı)</label>
+                            <input type="number" id="buffer_min_words_with_punct" value="5" min="2" max="15">
+                            <span class="hint">Noktalama ile bitiyorsa gönder (≥ N kelime)</span>
+                        </div>
+                    </div>
+
+                    <div class="field-row">
+                        <div class="field">
+                            <label>Min. Cümle Sayısı</label>
+                            <input type="number" id="buffer_min_sentences" value="2" min="1" max="5">
+                            <span class="hint">≥ N tam cümle varsa hemen gönder</span>
+                        </div>
+                        <div class="field">
+                            <label>Min. Kelime (Timeout)</label>
+                            <input type="number" id="buffer_min_words_timeout" value="4" min="1" max="10">
+                            <span class="hint">Timeout flush için minimum kelime sayısı</span>
+                        </div>
+                    </div>
+
+                    <div class="field-row">
+                        <div class="field">
+                            <label>Max Buffer Kelime</label>
+                            <input type="number" id="buffer_max_buffer_words" value="30" min="10" max="100">
+                            <span class="hint">Güvenlik sınırı — N kelimeyi geçince zorla gönder</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-reset" onclick="loadConfig()"><svg class="btn-icon-svg" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg> Sıfırla</button>
+                    <button class="btn-save" onclick="saveSection('buffer')"><svg class="btn-icon-svg"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                        </svg> Kaydet</button>
+                </div>
+            </section>
+
+            <!-- Vocabulary (Sözlük) Panel -->
+            <section id="panel-vocab" class="tab-panel" role="tabpanel" aria-labelledby="tab-vocab" aria-hidden="true">
+                <div class="card">
+                    <h2 class="card-title">Özel Sözlük Yönetimi</h2>
+                    <p class="card-desc">Her STT modeli kendi kurallarına göre bir sözlük formatı bekler. Ayarları
+                        buradan bağımsız yönetebilirsiniz.</p>
+                    <div id="vocab_disabled_notice"
+                        style="display:none; background:#fef3c7; border:1px solid #f59e0b; border-radius:6px; padding:10px 14px; margin-bottom:12px; color:#92400e; font-size:13px;">
+                        ⚠️ Özel Sözlük şu an <strong>pasif</strong>. Etkinleştirmek için STT sekmesindeki "Özel Sözlük"
+                        toggle'ını açın ve kaydedin.
+                    </div>
+
+                    <!-- Speechmatics -->
+                    <div class="provider-section visible u-mt-16" id="vocab-section-speechmatics"
+                        style="display: block;">
+                        <span class="provider-badge provider-badge--speechmatics" id="vocab-badge-speechmatics">🎯
+                            Speechmatics (Max: 1000 Kelime)</span>
+                        <div class="field-row full">
+                            <div class="field">
+                                <label style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span>Kelimeler ve Okunuşları</span>
+                                    <span style="display:flex;gap:8px;align-items:center;">
+                                        <span id="vocab_count_speechmatics" style="font-size:11px;color:#6b7280;">0 /
+                                            1000</span>
+                                        <button type="button" class="btn-reset"
+                                            onclick="document.getElementById('file_speechmatics').click()"
+                                            style="padding: 4px 8px; font-size: 11px;">Dosyadan Yükle (.txt,
+                                            .json)</button>
+                                    </span>
+                                    <input type="file" id="file_speechmatics" accept=".txt,.csv,.json"
+                                        style="display:none;"
+                                        onchange="handleVocabFileUpload('stt_speechmatics_vocabulary', this)">
+                                </label>
+                                <textarea id="stt_speechmatics_vocabulary" rows="4"
+                                    placeholder="Örnek:&#10;ChatGPT&#10;Pipecat | payp ket&#10;Gladia | gladya, glayda"
+                                    oninput="updateVocabCount('stt_speechmatics_vocabulary','vocab_count_speechmatics',1000)"></textarea>
+                                <span class="hint">"Kelime | Okunuş1, Okunuş" formatını kullanabilirsiniz. Pipecat
+                                    "sounds_like" parametresini arka planda otomatik ekler.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gladia -->
+                    <div class="provider-section visible u-mt-16" id="vocab-section-gladia" style="display: block;">
+                        <span class="provider-badge gladia" id="vocab-badge-gladia">Gladia (Max: 250 Terim, Fonem
+                            Destekli)</span>
+                        <div class="field-row full">
+                            <div class="field">
+                                <label style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span>Kelimeler ve Okunuşları</span>
+                                    <span style="display:flex;gap:8px;align-items:center;">
+                                        <span id="vocab_count_gladia" style="font-size:11px;color:#6b7280;">0 /
+                                            250</span>
+                                        <button type="button" class="btn-reset"
+                                            onclick="document.getElementById('file_gladia').click()"
+                                            style="padding: 4px 8px; font-size: 11px;">Dosyadan Yükle (.txt,
+                                            .json)</button>
+                                    </span>
+                                    <input type="file" id="file_gladia" accept=".txt,.csv,.json" style="display:none;"
+                                        onchange="handleVocabFileUpload('stt_gladia_vocabulary', this)">
+                                </label>
+                                <textarea id="stt_gladia_vocabulary" rows="4"
+                                    placeholder="Örnek:&#10;ChatGPT&#10;Pipecat | payp ket&#10;Gladia | gladya, glayda"
+                                    oninput="updateVocabCount('stt_gladia_vocabulary','vocab_count_gladia',250)"></textarea>
+                                <span class="hint">"Kelime | Okunuş1, Okunuş" formatını kullanabilirsiniz. Gladia arka
+                                    planda akustik modelleme üzerinden okunuşları değerlendirir.</span>
+                            </div>
+                        </div>
+                        <!-- Intensity slider (okunuşlu kelimeler için) -->
+                        <div class="field u-mt-12">
+                            <label>Vocabulary Intensity (Okunuş Ağırlığı)</label>
+                            <div class="slider-group">
+                                <input type="range" id="stt_gladia_vocab_intensity" min="0" max="1" step="0.05"
+                                    value="0.5"
+                                    oninput="document.getElementById('gladia_intensity_val').textContent=parseFloat(this.value).toFixed(2)">
+                                <span class="slider-value" id="gladia_intensity_val">0.50</span>
+                            </div>
+                            <span class="hint">0.0 = hafif etki, 1.0 = maksimum ağırlık. Sadece "Okunuş" belirtilen
+                                kelimeler için geçerli.</span>
+                        </div>
+                    </div>
+
+                    <!-- Deepgram -->
+                    <div class="provider-section visible u-mt-16" id="vocab-section-deepgram" style="display: block;">
+                        <span class="provider-badge deepgram" id="vocab-badge-deepgram">Deepgram (Max: 100 Terim)</span>
+                        <div class="field-row full">
+                            <div class="field">
+                                <label style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span>Sadece Düz Kelimeler (Keyterm Prompting)</span>
+                                    <span style="display:flex;gap:8px;align-items:center;">
+                                        <span id="vocab_count_deepgram" style="font-size:11px;color:#6b7280;">0 /
+                                            100</span>
+                                        <button type="button" class="btn-reset"
+                                            onclick="document.getElementById('file_deepgram').click()"
+                                            style="padding: 4px 8px; font-size: 11px;">Dosyadan Yükle (.txt,
+                                            .json)</button>
+                                    </span>
+                                    <input type="file" id="file_deepgram" accept=".txt,.csv,.json" style="display:none;"
+                                        onchange="handleVocabFileUpload('stt_deepgram_vocabulary', this)">
+                                </label>
+                                <textarea id="stt_deepgram_vocabulary" rows="4"
+                                    placeholder="Örnek:&#10;ChatGPT&#10;Pipecat&#10;Gladia"
+                                    oninput="updateVocabCount('stt_deepgram_vocabulary','vocab_count_deepgram',100)"></textarea>
+                                <span class="hint">Deepgram okunuş belirtmeyi desteklemez. Sadece kelimeyi veya virgülle
+                                    ayrılmış listeyi yazın. Dik çizgi (|) ve sağı yoksayılır.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ElevenLabs Vocabulary Removed -->
+
+                </div>
+
+                <div class="actions">
+                    <button class="btn-reset" onclick="loadConfig()">Sıfırla</button>
+                    <button class="btn-save" onclick="saveSection('stt')"><svg class="btn-icon-svg" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                        </svg> Kaydet</button>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script src="/static/admin.js"></script>
+</body>
+
+</html>

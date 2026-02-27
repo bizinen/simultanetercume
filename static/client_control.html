@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pipecat Translation Client</title>
+    <style>
+        body { margin: 0; font-family: system-ui, sans-serif; }
+        iframe { width: 100%; height: 100vh; border: none; }
+    </style>
+</head>
+<body>
+    <iframe src="/client" id="client-frame"></iframe>
+    <script>
+        // Inject controls into iframe when loaded
+        document.getElementById('client-frame').onload = function() {
+            try {
+                var doc = this.contentDocument || this.contentWindow.document;
+                var script = doc.createElement('script');
+                script.src = '/static/controls.js?v=' + Date.now();
+                doc.body.appendChild(script);
+            } catch(e) {
+                console.error('Could not inject controls:', e);
+                var s = document.createElement('script');
+                s.src = '/static/controls.js?v=' + Date.now();
+                document.body.appendChild(s);
+            }
+        };
+    </script>
+</body>
+</html>

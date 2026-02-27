@@ -1,0 +1,10 @@
+.git
+.gitignore
+.idea
+*.pyc
+__pycache__
+logs/
+results/
+debug_audio/
+*.wav
+.DS_Store

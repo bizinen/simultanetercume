@@ -1,0 +1,31 @@
+# Pipecat core with plugins (daily extra added for DailyTransport support)
+pipecat-ai[elevenlabs,openai,google,groq,speechmatics,runner,webrtc,daily,aic,deepgram,gladia,rnnoise]==0.0.101
+
+# Missing dependencies causing the crash
+requests>=2.31.0
+python-multipart>=0.0.9
+
+# Authentication (JWT)
+PyJWT>=2.8.0
+passlib[bcrypt]>=1.7.4
+
+# Environment management
+python-dotenv>=1.0.0
+
+# Audio processing
+pydub>=0.25.1
+numpy>=1.24.0
+
+# Logging
+loguru>=0.7.0
+
+# Google GenAI SDK (Gemini Live WebSocket streaming)
+# Minimum 0.7.0: AudioTranscriptionConfig, ContextWindowCompressionConfig, SlidingWindow vb. gerektirir
+google-genai>=0.7.0
+
+# HTTP client
+aiohttp>=3.9.0
+
+# Server
+uvicorn>=0.27.0
+fastapi>=0.109.0
