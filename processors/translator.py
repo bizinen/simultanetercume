@@ -53,14 +53,14 @@ ABBREVIATIONS: Dict[str, Set[str]] = {
         # Titles
         'mr', 'mrs', 'ms', 'dr', 'prof', 'sr', 'jr', 'st', 'rev', 'hon',
         # Other common abbreviations
-        'etc', 'vs', 'ie', 'eg', 'al', 'approx', 'appt', 'apt', 'dept', 'est',
+        'etc', 'vs', 'i.e', 'e.g', 'al', 'approx', 'appt', 'apt', 'dept', 'est',
         'min', 'max', 'misc', 'no', 'num', 'tel', 'temp', 'vet', 'vol',
     },
     "de": {
         # German abbreviations
-        'abs', 'abb', 'anm', 'bzw', 'ca', 'd.h', 'dr', 'ev', 'ggf', 'hr', 'inkl',
+        'abs', 'abb', 'anm', 'bzw', 'ca', 'd.h', 'd. h', 'dr', 'ev', 'ggf', 'hr', 'inkl',
         'max', 'min', 'mio', 'mrd', 'nr', 'prof', 'sog', 'std', 'tel', 'usw', 'vgl',
-        'z.b', 'z.t',
+        'z.b', 'z. b', 'z.t', 'z. t',
     },
     "fr": {
         # French abbreviations
@@ -75,7 +75,7 @@ ABBREVIATIONS: Dict[str, Set[str]] = {
     "it": {
         # Italian abbreviations
         'sig', 'sig.ra', 'dott', 'dr', 'prof', 'avv', 'ing', 'arch', 'geom',
-        'p.es', 'ecc', 'pag', 'tel',
+        'p.es', 'p. es', 'ecc', 'pag', 'tel',
     }
 }
 
@@ -104,6 +104,20 @@ def _is_sentence_boundary(text: str, pos: int, abbreviations: Set[str]) -> bool:
                 last_word = last_word_parts[-1].lower().rstrip('.')
                 if last_word in abbreviations:
                     return False
+                # Check for two-word abbreviations looking backward (e.g., "z. b", "d. h")
+                if len(last_word_parts) >= 2:
+                    two_word = f"{last_word_parts[-2].lower().rstrip('.')}. {last_word}"
+                    if two_word in abbreviations:
+                        return False
+                # Check for two-word abbreviations looking forward (e.g., "p. es")
+                after = text[pos + 1:].lstrip()
+                if after:
+                    after_parts = after.split()
+                    if after_parts:
+                        next_word = after_parts[0].lower().rstrip('.')
+                        forward_two_word = f"{last_word}. {next_word}"
+                        if forward_two_word in abbreviations:
+                            return False
     # Check it's followed by space or end (with optional closing quotes)
     after = text[pos + 1:]
     after_stripped = after.lstrip('"\u201d\u00BB)')
